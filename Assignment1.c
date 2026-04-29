@@ -1,82 +1,76 @@
 #include <stdio.h>
 #include <string.h>
-#include <stdbool.h>
 
-#define SIZE 50 
+#define bf 50
 
 typedef struct {
-    char buffer[SIZE];
+    char data[bf];
     int head;
     int tail;
-    int count;
-} CircularBuffer;
+    int a;
+} x;
 
-void init(CircularBuffer *cb) {
-    cb->head = 0;
-    cb->tail = 0;
-    cb->count = 0;
+
+
+void c(x *b) {
+    b->head = 0;
+    b->tail = 0;
+    b->a = 0;
 }
 
-bool isFull(CircularBuffer *cb) {
-    return cb->count == SIZE;
+int full(x *b) {
+    return b->a == bf; }
+
+
+int e(x *b) {
+    return b->a == 0;
 }
 
-bool isEmpty(CircularBuffer *cb) {
-    return cb->count == 0;
-}
 
-void write(CircularBuffer *cb, char data) {
-    if (isFull(cb)) {
-        printf("\nBuffer Overflow\n");
-        return;
+
+void r(x *b, char val) {
+    if (!full(b)) {
+        b->data[b->tail] = val;
+        b->tail = (b->tail + 1) % bf;
+        b->a++;
+    } }
+
+char read(x *b) {
+    if (!e(b)) {
+        char val = b->data[b->head];
+        b->head = (b->head + 1) % bf;
+        b->a--;
+        return val;
     }
-    cb->buffer[cb->tail] = data;
-    cb->tail = (cb->tail + 1) % SIZE;
-    cb->count++;
+    return '\0';
 }
 
-char read(CircularBuffer *cb) {
-    if (isEmpty(cb)) {
-        printf("\nBuffer Underflow\n");
-        return '\0'; 
-    }
-    char data = cb->buffer[cb->head];
-    cb->head = (cb->head + 1) % SIZE;
-    cb->count--;
-    return data;
-}
 
 int main() {
-    CircularBuffer cb;
-    init(&cb);
+    x my_b;
+    c(&my_b);
+    char my_name[100];
+    char extra[] = "-CE-ESY";
 
-    char name[100];
-    char suffix[] = "CE-ESY";
+    printf("Enter name: ");
+    if (fgets(my_name, sizeof(my_name), stdin) != NULL) {
+        my_name[strcspn(my_name, "\n")] = 0; }
 
-    printf("أدخل اسمك: ");
-    if (fgets(name, sizeof(name), stdin) != NULL) {
-        name[strcspn(name, "\n")] = 0;
+    strcat(my_name, extra);
+    printf("Text to save: %s\n", my_name);
+
+    for (int i = 0; i < strlen(my_name); i++) {
+        r(&my_b, my_name[i]);
     }
 
-    strcat(name, suffix);
-    printf("النص المراد تخزينه: %s\n", name);
-
-    for (int i = 0; i < strlen(name); i++) {
-        write(&cb, name[i]);
+    printf("Output from Buffer: ");
+    while (!e(&my_b)) {
+        char res = read(&my_b);
+        if (res != '\0') {
+            printf("%c", res);
     }
-
-    printf("النتيجة المستخرجة من المخزن: ");
-    while (!isEmpty(&cb)) {
-        char c = read(&cb);
-        if (c != '\0') {
-            printf("%c", c);
-        }
     }
     printf("\n");
-
-    if (isEmpty(&cb)) {
-        printf("المخزن الآن فارغ تماماً.\n");
-    }
 
     return 0;
 }
